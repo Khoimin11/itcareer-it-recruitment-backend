@@ -265,3 +265,38 @@ export const editJobPatch = async (req: AccountRequest, res: Response) => {
     })
   }
 }
+
+export const deleteJobDel = async (req: AccountRequest, res: Response) => {
+  try {
+    const id = req.params.id;
+
+    const jobDetail = await Job.findOne({
+      _id: id,
+      companyId: req.account.id
+    })
+
+    if(!jobDetail) {
+      res.json({
+        code: "error",
+        message: "Id không hợp lệ!"
+      })
+      return;
+    }
+
+    await Job.deleteOne({
+      _id: id,
+      companyId: req.account.id
+    })
+
+    res.json({
+      code: "success",
+      message: "Đã xóa!"
+    })
+  } catch (error) {
+    console.log(error);
+    res.json({
+      code: "error",
+      message: "Id không hợp lệ!"
+    })
+  }
+}
