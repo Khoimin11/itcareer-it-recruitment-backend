@@ -187,3 +187,81 @@ export const listJob = async (req: AccountRequest, res: Response) => {
     totalPage: totalPage
   })
 }
+
+export const editJob = async (req: AccountRequest, res: Response) => {
+  try {
+    const id = req.params.id;
+
+    const jobDetail = await Job.findOne({
+      _id: id,
+      companyId: req.account.id
+    })
+
+    if(!jobDetail) {
+      res.json({
+        code: "error",
+        message: "Id không hợp lệ!"
+      })
+      return;
+    }
+
+    res.json({
+      code: "success",
+      message: "Thành công!",
+      jobDetail: jobDetail
+    })
+  } catch (error) {
+    console.log(error);
+    res.json({
+      code: "error",
+      message: "Id không hợp lệ!"
+    })
+  }
+}
+
+export const editJobPatch = async (req: AccountRequest, res: Response) => {
+  try {
+    const id = req.params.id;
+
+    const jobDetail = await Job.findOne({
+      _id: id,
+      companyId: req.account.id
+    })
+
+    if(!jobDetail) {
+      res.json({
+        code: "error",
+        message: "Id không hợp lệ!"
+      })
+      return;
+    }
+
+    req.body.salaryMin = req.body.salaryMin ? parseInt(req.body.salaryMin) : 0;
+    req.body.salaryMax = req.body.salaryMax ? parseInt(req.body.salaryMax) : 0;
+    req.body.technologies = req.body.technologies ? req.body.technologies.split(", ") : [];
+    req.body.images = [];
+
+    // Xử lý mảng images
+    if (req.files) {
+      for (const file of req.files as any[]) {
+        req.body.images.push(file.path);
+      }
+    }
+
+    await Job.updateOne({
+      _id: id,
+      companyId: req.account.id
+    }, req.body)
+
+    res.json({
+      code: "success",
+      message: "Cập nhật thành công!"
+    })
+  } catch (error) {
+    console.log(error);
+    res.json({
+      code: "error",
+      message: "Id không hợp lệ!"
+    })
+  }
+}
