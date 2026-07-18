@@ -53,6 +53,16 @@ export const search = async (req: Request, res: Response) => {
       ];
     }
 
+    // Position
+    if (typeof req.query.position === "string") {
+      find.position = req.query.position;
+    }
+
+    // Working form
+    if (typeof req.query.workingForm === "string") {
+      find.workingForm = req.query.workingForm;
+    }
+
     const jobs = await Job
       .find(find)
       .sort({
