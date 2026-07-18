@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+﻿import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import AccountCompany from "../models/account-company.model";
 import jwt from "jsonwebtoken";
@@ -307,12 +307,29 @@ export const list = async (req: Request, res: Response) => {
     limitItems = parseInt(`${req.query.limitItems}`);
   }
 
+  // Phân trang
+  let page = 1;
+  if(req.query.page) {
+    const currentPage = parseInt(`${req.query.page}`);
+    if(currentPage > 0) {
+      page = currentPage;
+    }
+  }
+  const totalRecord = await Job.countDocuments({});
+  const totalPage = Math.ceil(totalRecord/limitItems);
+  if(page > totalPage && totalPage != 0) {
+    page = totalPage;
+  }
+  const skip = (page - 1) * limitItems;
+  // Hết Phân trang
+
   const companyList = await AccountCompany
     .find({})
-    .limit(limitItems)
     .sort({
       createdAt: "desc"
-    });
+    })
+    .limit(limitItems)
+    .skip(skip);
 
   const companyListFinal = [];
 
@@ -343,6 +360,7 @@ export const list = async (req: Request, res: Response) => {
   res.json({
     code: "success",
     message: "Thành công!",
-    companyList: companyListFinal
+    companyList: companyListFinal,
+    totalPage: totalPage
   })
 }
