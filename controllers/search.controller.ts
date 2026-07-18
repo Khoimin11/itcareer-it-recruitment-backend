@@ -10,25 +10,34 @@ export const search = async (req: Request, res: Response) => {
     const find: any = {};
 
     // Language
-    if(typeof req.query.language === "string") {
+    if(req.query.language) {
       find.technologies = req.query.language;
     }
 
     // City
-    if(typeof req.query.city === "string") {
+    if(req.query.city) {
       const city = await City.findOne({
         name: req.query.city
       })
 
       if(city) {
         const listAccountCompanyInCity = await AccountCompany.find({
-          city: city._id.toString()
+          city: city.id
         })
 
-        const listIdAccountCompany = listAccountCompanyInCity.map(item => item._id.toString());
+        const listIdAccountCompany = listAccountCompanyInCity.map(item => item.id);
 
         find.companyId = { $in: listIdAccountCompany };
       }
+    }
+
+    // Company
+    if(req.query.company) {
+      const accountCompany = await AccountCompany.findOne({
+        companyName: req.query.company
+      })
+
+      find.companyId = accountCompany?.id;
     }
 
     const jobs = await Job
