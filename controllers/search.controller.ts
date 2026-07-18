@@ -10,34 +10,47 @@ export const search = async (req: Request, res: Response) => {
     const find: any = {};
 
     // Language
-    if(req.query.language) {
+    if (typeof req.query.language === "string") {
       find.technologies = req.query.language;
     }
 
     // City
-    if(req.query.city) {
+    if (typeof req.query.city === "string") {
       const city = await City.findOne({
         name: req.query.city
-      })
+      });
 
-      if(city) {
+      if (city) {
         const listAccountCompanyInCity = await AccountCompany.find({
-          city: city.id
-        })
+          city: city._id.toString()
+        });
 
-        const listIdAccountCompany = listAccountCompanyInCity.map(item => item.id);
+        const listIdAccountCompany = listAccountCompanyInCity.map(
+          (item) => item._id.toString()
+        );
 
         find.companyId = { $in: listIdAccountCompany };
       }
     }
 
     // Company
-    if(req.query.company) {
+    if (typeof req.query.company === "string") {
       const accountCompany = await AccountCompany.findOne({
         companyName: req.query.company
-      })
+      });
 
-      find.companyId = accountCompany?.id;
+      if (accountCompany) {
+        find.companyId = accountCompany._id.toString();
+      }
+    }
+
+    // Keyword
+    if (typeof req.query.keyword === "string") {
+      const keywordRegex = new RegExp(req.query.keyword, "i");
+      find["$or"] = [
+        { title: keywordRegex },
+        { technologies: keywordRegex }
+      ];
     }
 
     const jobs = await Job
