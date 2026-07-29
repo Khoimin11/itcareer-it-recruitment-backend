@@ -75,7 +75,7 @@ export const search = async (req: Request, res: Response) => {
     }
 
     // Phân trang
-    const limitItems = 2;
+    const limitItems = 8;
     let page = 1;
     if(req.query.page) {
       const currentPage = parseInt(`${req.query.page}`);
