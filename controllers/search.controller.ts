@@ -3,6 +3,10 @@ import Job from "../models/job.model";
 import AccountCompany from "../models/account-company.model";
 import City from "../models/city.model";
 
+const escapeRegex = (value: string) => {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+};
+
 export const search = async (req: Request, res: Response) => {
   const dataFinal = [];
   let totalPage = 0;
@@ -12,14 +16,15 @@ export const search = async (req: Request, res: Response) => {
     const find: any = {};
 
     // Language
-    if (typeof req.query.language === "string") {
-      find.technologies = req.query.language;
+    if (typeof req.query.language === "string" && req.query.language.trim()) {
+      const languageRegex = new RegExp(`^${escapeRegex(req.query.language.trim())}$`, "i");
+      find.technologies = languageRegex;
     }
 
     // City
-    if (typeof req.query.city === "string") {
+    if (typeof req.query.city === "string" && req.query.city.trim()) {
       const city = await City.findOne({
-        name: req.query.city
+        name: req.query.city.trim()
       });
 
       if (city) {
@@ -32,23 +37,27 @@ export const search = async (req: Request, res: Response) => {
         );
 
         find.companyId = { $in: listIdAccountCompany };
+      } else {
+        find.companyId = { $in: [] };
       }
     }
 
     // Company
-    if (typeof req.query.company === "string") {
+    if (typeof req.query.company === "string" && req.query.company.trim()) {
       const accountCompany = await AccountCompany.findOne({
-        companyName: req.query.company
+        companyName: req.query.company.trim()
       });
 
       if (accountCompany) {
         find.companyId = accountCompany._id.toString();
+      } else {
+        find.companyId = "__NOT_FOUND__";
       }
     }
 
     // Keyword
-    if (typeof req.query.keyword === "string") {
-      const keywordRegex = new RegExp(req.query.keyword, "i");
+    if (typeof req.query.keyword === "string" && req.query.keyword.trim()) {
+      const keywordRegex = new RegExp(escapeRegex(req.query.keyword.trim()), "i");
       find["$or"] = [
         { title: keywordRegex },
         { technologies: keywordRegex }
@@ -56,13 +65,13 @@ export const search = async (req: Request, res: Response) => {
     }
 
     // Position
-    if (typeof req.query.position === "string") {
-      find.position = req.query.position;
+    if (typeof req.query.position === "string" && req.query.position.trim()) {
+      find.position = req.query.position.trim();
     }
 
     // Working form
-    if (typeof req.query.workingForm === "string") {
-      find.workingForm = req.query.workingForm;
+    if (typeof req.query.workingForm === "string" && req.query.workingForm.trim()) {
+      find.workingForm = req.query.workingForm.trim();
     }
 
     // Phân trang
