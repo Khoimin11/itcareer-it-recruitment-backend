@@ -1,5 +1,6 @@
 ﻿import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
+import mongoose from "mongoose";
 import AccountCompany from "../models/account-company.model";
 import jwt from "jsonwebtoken";
 import { AccountRequest } from "../interfaces/request.interface";
@@ -319,7 +320,7 @@ export const list = async (req: Request, res: Response) => {
       page = currentPage;
     }
   }
-  const totalRecord = await Job.countDocuments({});
+  const totalRecord = await AccountCompany.countDocuments({});
   const totalPage = Math.ceil(totalRecord/limitItems);
   if(page > totalPage && totalPage != 0) {
     page = totalPage;
@@ -347,10 +348,12 @@ export const list = async (req: Request, res: Response) => {
     };
 
     // Thành phố
-    const city = await City.findOne({
-      _id: item.city
-    })
-    dataItemFinal.cityName = `${city?.name}`;
+    if (item.city && mongoose.isValidObjectId(item.city)) {
+      const city = await City.findOne({
+        _id: item.city
+      })
+      dataItemFinal.cityName = `${city?.name || ""}`;
+    }
 
     // Tổng số việc làm
     const totalJob = await Job.countDocuments({
