@@ -1,11 +1,15 @@
 {
   "compilerOptions": {
-    "target": "ES2020",           // Biên dịch về ES2020
-    "module": "Node16",           // Dùng hệ module phù hợp với Node.js hiện đại
-    "moduleResolution": "node16", // Cách resolve module cho Node.js hiện đại
-    "esModuleInterop": true,      // Dùng import thay require
-    "resolveJsonModule": true,    // Cho phép import file JSON
-    "strict": true,               // Bật chế độ kiểm tra chặt chẽ
-    "skipLibCheck": true          // Bỏ qua kiểm tra kiểu trong file .d.ts để giảm lỗi không cần thiết
-  }
+    "target": "ES2020",
+    "module": "Node16",
+    "moduleResolution": "node16",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "rootDir": "./",
+    "outDir": "./dist"
+  },
+  "include": ["**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }
