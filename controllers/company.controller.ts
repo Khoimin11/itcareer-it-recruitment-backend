@@ -138,7 +138,7 @@ export const listJob = async (req: AccountRequest, res: Response) => {
   };
 
   // Phân trang
-  const limitItems = 2;
+  const limitItems = 6;
   let page = 1;
   if(req.query.page) {
     const currentPage = parseInt(`${req.query.page}`);
@@ -187,7 +187,8 @@ export const listJob = async (req: AccountRequest, res: Response) => {
     code: "success",
     message: "Lấy danh sách công việc thành công!",
     jobs: dataFinal,
-    totalPage: totalPage
+    totalPage: totalPage,
+    totalRecord: totalRecord
   })
 }
 
