@@ -3,11 +3,21 @@ import jwt from "jsonwebtoken";
 import AccountUser from "../models/account-user.model";
 import AccountCompany from "../models/account-company.model";
 
+const clearTokenCookie = (res: Response) => {
+  const isProduction = process.env.NODE_ENV === "production";
+
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax"
+  });
+};
+
 export const check = async (req: Request, res: Response) => {
   try {
     const token = req.cookies.token;
 
-    if(!token) {
+    if (!token) {
       res.json({
         code: "error",
         message: "Token không hợp lệ!"
@@ -15,16 +25,15 @@ export const check = async (req: Request, res: Response) => {
       return;
     }
 
-    const decoded = jwt.verify(token, `${process.env.JWT_SECRET}`) as jwt.JwtPayload; // Giải mã token
+    const decoded = jwt.verify(token, `${process.env.JWT_SECRET}`) as jwt.JwtPayload;
     const { id, email } = decoded;
 
-    // Tìm user
     const existAccountUser = await AccountUser.findOne({
       _id: id,
       email: email
     });
 
-    if(existAccountUser) {
+    if (existAccountUser) {
       const infoUser = {
         id: existAccountUser.id,
         fullName: existAccountUser.fullName,
@@ -41,13 +50,12 @@ export const check = async (req: Request, res: Response) => {
       return;
     }
 
-    // Tìm company
     const existAccountCompany = await AccountCompany.findOne({
       _id: id,
       email: email
     });
 
-    if(existAccountCompany) {
+    if (existAccountCompany) {
       const infoCompany = {
         id: existAccountCompany.id,
         companyName: existAccountCompany.companyName,
@@ -71,26 +79,24 @@ export const check = async (req: Request, res: Response) => {
       return;
     }
 
-    if(!existAccountUser && !existAccountCompany) {
-      res.clearCookie("token");
-      res.json({
-        code: "error",
-        message: "Token không hợp lệ!"
-      });
-    }
+    clearTokenCookie(res);
+    res.json({
+      code: "error",
+      message: "Token không hợp lệ!"
+    });
   } catch (error) {
-    res.clearCookie("token");
+    clearTokenCookie(res);
     res.json({
       code: "error",
       message: "Token không hợp lệ!"
     });
   }
-}
+};
 
-export const logout = async (req: Request, res: Response) => {
-  res.clearCookie("token");
+export const logout = async (_req: Request, res: Response) => {
+  clearTokenCookie(res);
   res.json({
     code: "success",
     message: "Đã đăng xuất!"
   });
-}
+};
