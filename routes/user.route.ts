@@ -34,4 +34,16 @@ router.get(
   userController.listCV
 );
 
+router.get(
+  '/cv/detail/:id',
+  authMiddleware.verifyTokenUser,
+  userController.detailCV
+);
+
+router.delete(
+  '/cv/delete/:id',
+  authMiddleware.verifyTokenUser,
+  userController.deleteCVDel
+);
+
 export default router;
