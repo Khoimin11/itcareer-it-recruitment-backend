@@ -23,8 +23,13 @@ export const search = async (req: Request, res: Response) => {
 
     // City
     if (typeof req.query.city === "string" && req.query.city.trim()) {
+      const cityName = req.query.city.trim().replace(/^(?:thành phố|tp\.?)\s+/i, "");
+      const cityRegex = new RegExp(
+        `^(?:(?:Thành phố|TP\\.?)\\s+)?${escapeRegex(cityName)}$`,
+        "i"
+      );
       const city = await City.findOne({
-        name: req.query.city.trim()
+        name: cityRegex
       });
 
       if (city) {
