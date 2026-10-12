@@ -64,6 +64,7 @@ export const registerPost = (req: Request, res: Response, next: NextFunction) =>
 
 export const loginPost = (req: Request, res: Response, next: NextFunction) => {
   const schema = Joi.object({
+    rememberPassword: Joi.boolean().strict().optional(),
     email: Joi.string()
       .required()
       .email()

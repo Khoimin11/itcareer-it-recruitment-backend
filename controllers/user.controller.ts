@@ -40,7 +40,7 @@ export const registerPost = async (req: Request, res: Response) => {
 };
 
 export const loginPost = async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+  const { email, password, rememberPassword } = req.body;
 
   const existAccount = await AccountUser.findOne({
     email: email
@@ -70,14 +70,14 @@ export const loginPost = async (req: Request, res: Response) => {
     },
     `${process.env.JWT_SECRET}`,
     {
-      expiresIn: "1d"
+      expiresIn: rememberPassword === true ? "30d" : "1d"
     }
   );
 
   const isProduction = process.env.NODE_ENV === "production";
 
   res.cookie("token", token, {
-    maxAge: 24 * 60 * 60 * 1000,
+    maxAge: (rememberPassword === true ? 30 : 1) * 24 * 60 * 60 * 1000,
     httpOnly: true,
     secure: isProduction,
     sameSite: isProduction ? "none" : "lax"
