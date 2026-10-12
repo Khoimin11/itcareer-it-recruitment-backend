@@ -6,7 +6,18 @@ const schema = new mongoose.Schema(
     email: String,
     password: String,
     avatar: String,
-    phone: String
+    phone: String,
+    title: String,
+    birthday: String,
+    gender: String,
+    address: String,
+    linkedin: String,
+    general: {
+      experience: String, level: String, education: String, major: String,
+      skills: String, workingForms: String, industries: String, salary: String,
+      languages: String, availability: String
+    },
+    introduction: String
   },
   {
     timestamps: true, // Tự động sinh ra trường createdAt và updatedAt

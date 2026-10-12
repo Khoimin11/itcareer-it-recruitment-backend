@@ -4,10 +4,22 @@ import * as userValidate from "../validates/user.validate";
 import multer from "multer";
 import { storage } from "../helpers/cloudinary.helper";
 import * as authMiddleware from "../middlewares/auth.middleware";
+import * as attachments from "../controllers/attachments.controller";
 
 const router = Router();
 
 const upload = multer({ storage: storage });
+const personalCVUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 3 * 1024 * 1024, files: 1 } });
+
+router.get('/attachments', authMiddleware.verifyTokenUser, attachments.getProfile);
+router.patch('/attachments', authMiddleware.verifyTokenUser, attachments.updateProfile);
+router.get('/attachments/cv', authMiddleware.verifyTokenUser, attachments.viewCV);
+router.post('/attachments/cv', authMiddleware.verifyTokenUser, (req, res, next) => {
+  personalCVUpload.single('cv')(req, res, error => {
+    if (error) { res.status(400).json({ code: 'error', message: 'Vui lòng chọn một tệp PDF dưới 3 MB.' }); return; }
+    next();
+  });
+}, attachments.uploadCV);
 
 router.post(
   '/register', 
