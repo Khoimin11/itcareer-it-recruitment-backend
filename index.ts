@@ -10,6 +10,9 @@ dotenv.config();
 const app = express();
 const port = Number(process.env.PORT) || 4000;
 const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+const allowedOrigins = process.env.NODE_ENV === "production"
+  ? [frontendUrl]
+  : [frontendUrl, "http://localhost:3000", "http://localhost:3001"];
 
 connectDB();
 
@@ -17,7 +20,7 @@ app.set("trust proxy", 1);
 
 app.use(
   cors({
-    origin: frontendUrl,
+    origin: allowedOrigins,
     methods: ["GET", "POST", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true
